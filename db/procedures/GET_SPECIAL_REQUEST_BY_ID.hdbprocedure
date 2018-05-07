@@ -1,0 +1,40 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_SPECIAL_REQUEST_BY_ID" (
+  IN in_special_request_id bigint,
+  OUT out_result TABLE (special_request_id bigint,
+  						material_description nvarchar(500),
+  						material_code nvarchar(255),
+  						ITEM integer,
+   						START_DATE timestamp,
+   						END_DATE timestamp,
+   						UNIT_PRICE decimal(19,2),
+					   	QUANTITY integer,
+					   	CURRENCY_ID bigint,
+					   	VENDOR_TEXT nvarchar(1000),
+					   	UNIT nvarchar(255),
+					   	AMOUNT decimal(19,2),
+					   	BUDGET decimal(19,2)
+					   	)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+READS SQL DATA AS
+BEGIN
+  out_result = SELECT special_request_id,
+  					   material_description,
+  					   material_code,
+  					   ITEM,
+  					   START_DATE,
+   					   END_DATE,
+   					   UNIT_PRICE,
+					   QUANTITY,
+					   CURRENCY_ID,
+					   VENDOR_TEXT,
+					   UNIT,
+					   AMOUNT,
+					   BUDGET
+              FROM "MKTG_CART_REQUEST_TOOL"."SPECIAL_REQUEST"
+               WHERE SPECIAL_REQUEST_ID = in_special_request_id
+               AND ENABLED = 1 
+               AND DELETED = 0;
+END;

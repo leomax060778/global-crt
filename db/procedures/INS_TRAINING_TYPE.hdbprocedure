@@ -1,0 +1,15 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_TRAINING_TYPE" (
+ IN in_name nvarchar(255),
+ IN in_created_user_id bigint,
+ OUT out_result bigint
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+   INSERT INTO "MKTG_CART_REQUEST_TOOL"."TRAINING_TYPE" (name, created_user_id)
+    VALUES(in_name, in_created_user_id);
+   
+   SELECT TOP 1 CURRENT_IDENTITY_VALUE() INTO out_result FROM "MKTG_CART_REQUEST_TOOL"."TRAINING_TYPE";
+END;

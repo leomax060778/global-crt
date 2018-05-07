@@ -1,0 +1,51 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ALL_TEMPLATE_BY_PARENT_SECTION" (
+	IN in_parent_id bigint,
+	IN in_section_id bigint,
+	OUT out_result TABLE ( 
+						template_id bigint, 
+						user_id bigint, 
+						template_type_id bigint, 
+						template_parent_id bigint, 
+						name nvarchar(2048), 
+						link nvarchar(2048), 
+						template_order integer, 
+						deleted_template_name nvarchar(255), 
+						description nvarchar(1000), 
+						section_id bigint,
+						attachment_id integer,
+						original_name nvarchar(255),
+						saved_name nvarchar(255),
+						template_type_name nvarchar (255),
+						ATTACHMENT_CREATED_DATE timestamp,
+						TEMPLATE_CREATED_DATE timestamp
+					)
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	out_result = SELECT TMPL.TEMPLATE_ID, 
+						TMPL.USER_ID, 
+						TMPL.TEMPLATE_TYPE_ID, 
+						TMPL.TEMPLATE_PARENT_ID, 
+						TMPL.NAME, 
+						TMPL.LINK, 
+						TMPL.TEMPLATE_ORDER, 
+						TMPL.DELETED_TEMPLATE_NAME, 
+						TMPL.DESCRIPTION, 
+						TMPL.SECTION_ID,
+						TMPL.ATTACHMENT_ID,
+						ATT.ORIGINAL_NAME,
+						ATT.SAVED_NAME,
+						(CASE WHEN (TMPL.ATTACHMENT_ID is not null) THEN ATT.ATTACHMENT_TYPE ELSE TPTY.name END) as template_type_name,
+					 	ATT.CREATED_DATE_TZ AS ATTACHMENT_CREATED_DATE,
+					 	TMPL.CREATED_DATE_TZ AS TEMPLATE_CREATED_DATE
+	FROM "TEMPLATE" TMPL
+		INNER JOIN "TEMPLATE_TYPE" TPTY ON TMPL.template_type_id = TPTY.template_type_id
+ 		LEFT JOIN "ATTACHMENT" ATT ON TMPL.ATTACHMENT_ID = ATT.ATTACHMENT_ID
+		WHERE in_parent_id = TMPL.TEMPLATE_PARENT_ID
+		AND in_section_id = TMPL.SECTION_ID
+		AND TMPL.deleted = 0
+		AND TMPL.enabled = 1;
+END;

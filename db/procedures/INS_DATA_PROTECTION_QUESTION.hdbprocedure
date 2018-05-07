@@ -1,0 +1,18 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_DATA_PROTECTION_QUESTION" (
+ IN in_content nvarchar (512),
+ IN in_description nvarchar (1000),
+ IN in_short_description nvarchar(255),
+ IN in_crt_type_id bigint,
+ IN in_created_user_id bigint,
+ OUT out_result bigint
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+   INSERT INTO "MKTG_CART_REQUEST_TOOL"."DATA_PROTECTION_QUESTION" (content, description, short_description, crt_type_id, created_user_id)
+    VALUES(in_content, in_description, in_short_description, in_crt_type_id, in_created_user_id);
+   
+   SELECT TOP 1 CURRENT_IDENTITY_VALUE() INTO out_result FROM "MKTG_CART_REQUEST_TOOL"."DATA_PROTECTION_QUESTION";
+END;

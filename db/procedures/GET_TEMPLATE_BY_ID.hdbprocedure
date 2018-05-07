@@ -1,0 +1,38 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_TEMPLATE_BY_ID" (
+    IN in_template_id bigint,
+    OUT out_result TABLE (
+          TEMPLATE_ID BIGINT,
+          USER_ID BIGINT,
+          TEMPLATE_TYPE_ID BIGINT,
+          TEMPLATE_PARENT_ID INTEGER,
+          NAME NVARCHAR(2048),
+          LINK NVARCHAR(2048),
+          TEMPLATE_ORDER INTEGER,
+          DELETED_TEMPLATE_NAME NVARCHAR(255),
+          DESCRIPTION NVARCHAR(1000),
+          SECTION_ID BIGINT,
+          ORIGINAL_NAME NVARCHAR(255)
+        )
+ )
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	out_result = SELECT TPL.TEMPLATE_ID,
+                        TPL.USER_ID,
+                        TPL.TEMPLATE_TYPE_ID,
+                        TPL.TEMPLATE_PARENT_ID,
+                        TPL.NAME,
+                        TPL.LINK,
+                        TPL.TEMPLATE_ORDER,
+                        TPL.DELETED_TEMPLATE_NAME,
+                        TPL.DESCRIPTION,
+                        TPL.SECTION_ID,
+                        ATT.ORIGINAL_NAME
+                FROM "TEMPLATE" TPL
+                    LEFT JOIN "ATTACHMENT" ATT ON TPL.ATTACHMENT_ID = ATT.ATTACHMENT_ID
+                WHERE TPL.TEMPLATE_ID = in_template_id
+                    AND TPL.DELETED = 0
+                    AND TPL.ENABLED = 1;
+END;

@@ -1,0 +1,54 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::UPD_REQUEST" (
+	IN in_request_id BIGINT,
+	IN in_team_id BIGINT,
+	IN in_entity_id BIGINT,
+	IN in_budget_year_id BIGINT,
+	
+	IN in_material_id BIGINT,
+	IN in_vendor_id BIGINT,
+	IN in_vendor_contact_information_id BIGINT,
+	IN in_vendor_additional_information_id BIGINT,
+	IN in_non_sap_vendor_id BIGINT,
+	
+	IN in_goods_recipient_username NVARCHAR(127),
+	IN in_data_protection_enabled tinyint,
+	IN in_infrastructure_of_work_id BIGINT,
+	IN in_location_of_work_id BIGINT,
+	IN in_alternative_vendor_name NVARCHAR(255),
+ 	IN in_alternative_vendor_phone NVARCHAR(255),
+ 	IN in_alternative_vendor_email NVARCHAR(255),
+ 	IN in_masked_alternative_vendor TINYINT,
+
+	IN in_modified_user_id BIGINT,
+    OUT out_result BIGINT
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+	UPDATE "REQUEST"
+	SET HL3_ID = in_team_id,
+		ENTITY_ID = in_entity_id,
+		BUDGET_YEAR_ID = in_budget_year_id,
+
+        MATERIAL_ID = in_material_id,
+        VENDOR_ID = in_vendor_id,
+        VENDOR_CONTACT_INFORMATION_ID = in_vendor_contact_information_id,
+        VENDOR_ADDITIONAL_INFORMATION_ID = in_vendor_additional_information_id,
+        NON_SAP_VENDOR_ID = in_non_sap_vendor_id,
+        GOODS_RECIPIENT_USERNAME = in_goods_recipient_username,
+        DATA_PROTECTION_ENABLED = in_data_protection_enabled,
+        INFRASTRUCTURE_OF_WORK_ID = in_infrastructure_of_work_id,
+        LOCATION_OF_WORK_ID = in_location_of_work_id,
+        ALTERNATIVE_VENDOR_NAME = in_alternative_vendor_name,
+        ALTERNATIVE_VENDOR_PHONE = in_alternative_vendor_phone,
+        ALTERNATIVE_VENDOR_EMAIL = in_alternative_vendor_email,
+        MASKED_ALTERNATIVE_VENDOR = in_masked_alternative_vendor,
+
+        MODIFIED_DATE_TZ = CURRENT_TIMESTAMP,
+        MODIFIED_USER_ID = in_modified_user_id
+	WHERE REQUEST_ID = in_request_id;
+
+SELECT ::ROWCOUNT into out_result FROM DUMMY; 
+END;

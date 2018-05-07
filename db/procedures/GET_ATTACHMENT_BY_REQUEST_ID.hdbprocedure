@@ -1,0 +1,29 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ATTACHMENT_BY_REQUEST_ID" (
+	IN in_request_id bigint,
+	OUT out_result TABLE ( 
+		attachment_id bigint, 
+		user_id bigint, 
+		original_name nvarchar(255), 
+		saved_name nvarchar(255), 
+		attachment_size integer,
+		created_date timestamp
+	)) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	out_result = 
+	SELECT 
+		ATT.ATTACHMENT_ID, 
+		ATT.USER_ID, 
+		ATT.ORIGINAL_NAME, 
+		ATT.SAVED_NAME, 
+		ATT.ATTACHMENT_SIZE,
+		ATT.CREATED_DATE_TZ AS CREATED_DATE
+	FROM "ATTACHMENT_REQUEST" ATR
+		INNER JOIN "ATTACHMENT" ATT ON ATR.attachment_id = ATT.attachment_id
+		WHERE in_request_id = ATR.REQUEST_ID
+		AND ATT.deleted = 0
+		AND ATT.enabled = 1;
+	END;

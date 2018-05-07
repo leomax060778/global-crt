@@ -1,0 +1,53 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_SPECIAL_REQUEST" (
+  IN in_request_id bigint,
+  IN in_material_description nvarchar(500),
+  IN in_material_code nvarchar(255),
+  IN in_item integer,
+  IN in_start_date nvarchar(32),
+  IN in_end_date nvarchar(32),
+  IN in_unit_price decimal(19,2),
+  IN in_quantity integer,
+  IN in_currency_id bigint,
+  IN in_vendor_text nvarchar(1000),
+  IN in_unit nvarchar(255),
+  IN in_amount decimal(19,2),
+  IN in_budget decimal(19,2),
+  IN in_created_user_id bigint,
+  OUT out_result bigint
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+AS
+BEGIN
+    INSERT INTO "MKTG_CART_REQUEST_TOOL"."SPECIAL_REQUEST"(request_id,
+    													material_description,
+    													material_code,
+    													item,
+    													START_DATE,
+   					   									END_DATE,
+   					   									UNIT_PRICE,
+   					   									QUANTITY,
+   					   									CURRENCY_ID,
+   					   									VENDOR_TEXT,
+													   	UNIT,
+													   	AMOUNT,
+													   	BUDGET,
+   					   									created_user_id)
+      								VALUES(in_request_id,
+											in_material_description,
+											in_material_code,
+											in_item,
+											TO_TIMESTAMP(in_start_date, 'MM-DD-YYYY'),
+											TO_TIMESTAMP(in_end_date, 'MM-DD-YYYY'),
+											in_unit_price,
+											in_quantity,
+											in_currency_id,
+											in_vendor_text,
+											in_unit,
+  											in_amount,
+  											in_budget,
+											in_created_user_id);
+											
+    SELECT TOP 1 CURRENT_IDENTITY_VALUE() INTO out_result FROM "MKTG_CART_REQUEST_TOOL"."SPECIAL_REQUEST";
+END;

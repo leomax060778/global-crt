@@ -1,0 +1,21 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_VENDOR_INQUIRY" (
+ IN in_user_id BIGINT,
+ IN in_created_user_id BIGINT,
+ IN in_vendor_type_id BIGINT,
+ IN in_vendor_name NVARCHAR(255),
+ OUT out_result BIGINT
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+
+--Get the next value for ID field
+SELECT "MKTG_CART_REQUEST_TOOL".SEQ_VENDOR_INQUIRY.NEXTVAL INTO out_result FROM dummy;
+
+  INSERT INTO "MKTG_CART_REQUEST_TOOL"."VENDOR_INQUIRY" (VENDOR_INQUIRY_ID,user_id, vendor_type_id, vendor_name, created_user_id)
+   VALUES(out_result,in_user_id, in_vendor_type_id, in_vendor_name, in_created_user_id);
+   
+  SELECT out_result FROM dummy;
+END;

@@ -1,0 +1,15 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_CRT_SUBJECT" (
+	IN in_crt_type_id bigint,
+	IN in_subject_id bigint,
+	IN in_created_user_id bigint,
+	OUT out_result bigint
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+	INSERT INTO "MKTG_CART_REQUEST_TOOL"."CRT_SUBJECT"(crt_type_id, subject_id, created_user_id)
+	VALUES(in_crt_type_id, in_subject_id, in_created_user_id);
+	SELECT ::ROWCOUNT into out_result FROM DUMMY;
+END;

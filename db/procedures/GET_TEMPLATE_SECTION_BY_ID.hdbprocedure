@@ -1,0 +1,18 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_TEMPLATE_SECTION_BY_ID" (
+	IN in_section_id BIGINT,
+	OUT out_result TABLE (SECTION_ID BIGINT,
+                          NAME NVARCHAR(255),
+                          SECTION_ORDER INTEGER
+                          )
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	out_result = SELECT SECTION_ID, NAME, SECTION_ORDER
+		FROM "TEMPLATE_SECTION"
+			WHERE SECTION_ID = in_section_id
+			    AND ENABLED = 1
+			    AND DELETED = 0;
+END;

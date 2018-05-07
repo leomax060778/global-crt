@@ -1,0 +1,20 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_MATERIAL_BY_NAME" (
+  IN in_material_name nvarchar(255),
+  OUT out_result TABLE (material_id bigint,
+						catalog_id bigint,
+						description nvarchar(255),
+						pop_up nvarchar(255),
+						code nvarchar(255)
+						)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+READS SQL DATA AS
+BEGIN
+  out_result = SELECT MT.material_id, MT.catalog_id, MT.description, MT.popup as pop_up, MT.code
+              FROM "MKTG_CART_REQUEST_TOOL"."MATERIAL" MT
+               WHERE UPPER(MT.DESCRIPTION) = UPPER(in_material_name)
+                     AND MT.ENABLED = 1 
+                     AND MT.DELETED = 0;
+END;

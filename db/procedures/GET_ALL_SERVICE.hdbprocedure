@@ -1,0 +1,33 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ALL_SERVICE" (
+  OUT out_result TABLE (service_id bigint,
+                      start_date timestamp,
+                      end_date timestamp,
+                      description nvarchar (255),
+                      amount decimal (19,2),
+                      currency_id bigint,
+                      currency_abbreviation nvarchar (255),
+                      budget decimal (19,2),
+                      item integer,
+                      line_number nvarchar(255)
+                    )
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+READS SQL DATA AS
+BEGIN
+  out_result = SELECT SER.service_id, 
+  				SER.start_date, 
+  				SER.end_date, 
+  				SER.description, 
+  				SER.amount, 
+  				SER.currency_id, 
+  				CU.ABBREVIATION AS currency_abbreviation,
+  				SER.budget, 
+  				SER.item,
+  				SER.line_number
+            FROM "SERVICE" SER
+            INNER JOIN "CURRENCY" CU ON SER.CURRENCY_ID = CU.CURRENCY_ID
+            WHERE SER.ENABLED = 1 AND SER.DELETED = 0
+            ORDER BY SER.ITEM;
+END;

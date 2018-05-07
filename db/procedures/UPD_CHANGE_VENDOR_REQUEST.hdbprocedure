@@ -1,0 +1,34 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::UPD_CHANGE_VENDOR_REQUEST" (
+  	IN in_change_vendor_request_id bigint, 
+  	IN in_user_id bigint, 
+  	IN in_entity_id bigint, 
+  	IN in_commodity_id bigint,
+  	IN in_vendor_name nvarchar(255),
+	IN in_vendor_account nvarchar(255),
+	IN in_vendor_contact_name nvarchar(255),
+	IN in_vendor_contact_phone nvarchar(255),
+	IN in_vendor_contact_email nvarchar(255),
+  	IN in_modified_user_id bigint,
+ OUT out_result bigint
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+	UPDATE CVR
+	SET CVR.user_id = in_user_id,
+		CVR.entity_id = in_entity_id,
+		CVR.commodity_id = in_commodity_id,
+		CVR.vendor_name = in_vendor_name,
+		CVR.vendor_account = in_vendor_account,
+		CVR.vendor_contact_name = in_vendor_contact_name,
+		CVR.vendor_contact_phone = in_vendor_contact_phone,
+		CVR.vendor_contact_email = in_vendor_contact_email,
+		CVR.modified_date_tz = CURRENT_TIMESTAMP,
+		CVR.modified_user_id = in_modified_user_id
+        FROM "CHANGE_VENDOR_REQUEST" CVR
+        WHERE CVR.change_vendor_request_id = in_CHANGE_VENDOR_REQUEST_id;
+
+SELECT ::ROWCOUNT into out_result FROM DUMMY;
+END;

@@ -1,0 +1,46 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ALL_TRAINING_BY_PARENT" (
+ IN in_parent_id bigint,
+ OUT out_result TABLE (
+	 training_type_id bigint, 
+	 parent_id bigint, 
+	 link nvarchar (2048), 
+	 name nvarchar (2048),
+	 description nvarchar (2048),  
+	 training_order integer,
+	 training_type_name nvarchar (255),
+	 training_id bigint,
+	 attachment_id integer,
+	 original_name nvarchar(255),
+	 saved_name nvarchar(255),
+	 ATTACHMENT_CREATED_DATE timestamp,
+	 TRAINING_CREATED_DATE timestamp,
+	 data_protection_folder tinyint
+	 )
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+ out_result = SELECT TR.training_type_id, 
+					 TR.parent_id, 
+					 TR.link, 
+					 TR.name, 
+					 TR.description,
+					 TR.training_order,
+					 (CASE WHEN (TR.ATTACHMENT_ID is not null) THEN ATT.ATTACHMENT_TYPE ELSE TTY.name END) as training_type_name,
+					 TR.TRAINING_ID,
+					 TR.ATTACHMENT_ID,
+					 ATT.ORIGINAL_NAME,
+					 ATT.SAVED_NAME,
+					 ATT.CREATED_DATE_TZ AS ATTACHMENT_CREATED_DATE,
+					 TR.CREATED_DATE_TZ AS TRAINING_CREATED_DATE,
+					 TR.data_protection_folder
+ 			FROM "TRAINING" TR
+ 			INNER JOIN "TRAINING_TYPE" TTY ON TR.training_type_id = TTY.training_type_id
+ 			LEFT JOIN "ATTACHMENT" ATT ON TR.ATTACHMENT_ID = ATT.ATTACHMENT_ID
+ 			WHERE TR.ENABLED = 1
+	 			AND TR.DELETED = 0
+	 			AND TR.PARENT_ID = in_parent_id
+ 			ORDER BY TR.TRAINING_ID;
+END;

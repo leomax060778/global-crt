@@ -1,0 +1,152 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ALL_REQUEST" (
+	IN in_user_id bigint,
+	OUT out_result TABLE(REQUEST_ID integer, 
+						 iso nvarchar(2), 
+						 STATUS_ID integer,
+						 STATUS_NAME nvarchar(255),
+						 VENDOR_NAME nvarchar(255),
+						 CURRENCY_ABBREVIATION nvarchar(255), 
+						 REQUEST_SERVICE_CART_AMOUNT DECIMAL,
+						 TEAM_NAME nvarchar(255),
+						 GOODS_RECIPIENT_USERNAME nvarchar(255),
+						 USER_NAME nvarchar(255),
+						 LAST_NAME nvarchar(255),
+						 FIRST_NAME nvarchar(255),
+						 BUDGET_YEAR bigint,
+						 REQUEST_CREATED_DATE nvarchar(50),
+  						 message_read integer,
+  						 show_message_read integer,
+  						 created_user_id bigint,
+  						 EDITABLE boolean
+	 					),
+	 OUT out_service_table TABLE(
+	 					REQUEST_ID integer,
+	 					service_id bigint,
+                      	start_date nvarchar(32),
+                      	end_date nvarchar(32),
+                      	description nvarchar (255),
+                      	amount decimal (19,2),
+                      	currency_id bigint,
+                      	currency_abbreviation nvarchar (255),
+                      	budget decimal (19,2),
+                      	item integer,
+                     	line_number nvarchar(255),
+  						shopping_cart nvarchar (255), 
+  						cart_date nvarchar(32), 
+  						purchase_order_number nvarchar (127),
+  						approval_date nvarchar(32), 
+  						user_id bigint ),
+  	OUT out_attachment_table TABLE(	request_id bigint,
+  									attachment_id bigint, 
+									user_id bigint, 
+									original_name nvarchar(255), 
+									saved_name nvarchar(255), 
+									attachment_size integer
+									)
+)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	va_purchase_order = SELECT 	VPO.request_id, 
+								VPO.shopping_cart, 
+								VPO.cart_date,
+								VPO.purchase_order_number,
+								VPO.approval_date,
+								VPO.user_id
+							FROM
+								(SELECT POS.request_id, 
+  										POS.shopping_cart,
+  										TO_NVARCHAR(POS.cart_date, 'YYYY-MM-DD') AS cart_date,
+  										POS.purchase_order_number,
+  										TO_NVARCHAR(POS.approval_date, 'YYYY-MM-DD') AS approval_date,
+  										POS.user_id
+                    	FROM "PURCHASE_ORDER_SERVICE" POS
+                      		WHERE POS.ENABLED = 1 
+                           		AND POS.DELETED = 0) VPO;
+                           								                           		
+	va_message = SELECT T.MESSAGE_READ, T.REQUEST_ID,
+						case when T.MESSAGE_READ > 0 then 1 else 0 end as SHOW_MESSAGE_READ
+						FROM
+						 (SELECT RM.REQUEST_ID, 
+						 sum(case when RM.MESSAGE_READ = 0 then 1 else 0 end) AS MESSAGE_READ
+						 	FROM "REQUEST_MESSAGE" RM
+						 	WHERE RM.CREATED_USER_ID != in_user_id AND RM.DELETED = 0 AND RM.ENABLED = 1
+						 	GROUP BY RM.REQUEST_ID) T;
+				 		
+	va_user_role = SELECT USR.ROLE_ID, USR.USER_ID, HL3.HL3_ID, USR.ENABLED, USR.DELETED
+						FROM "USER_ROLE" USR
+							LEFT JOIN "HL3_USER" HL3 ON HL3.USER_ID = USR.USER_ID
+						WHERE USR.USER_ID = in_user_id;
+				 		
+	out_result = SELECT DISTINCT RQ.REQUEST_ID,
+						 CTY.ISO AS iso, 
+						 ST.STATUS_ID AS STATUS_ID, 
+						 ST.NAME AS STATUS_NAME, 
+						 VAI.VENDOR_NAME AS VENDOR_NAME, 
+						 CUR.ABBREVIATION AS CURRENCY_ABBREVIATION,
+						 RS.CART_AMOUNT AS REQUEST_SERVICE_CART_AMOUNT,
+						 HL3.HL3_DESCRIPTION AS TEAM_NAME,
+						 RQ.GOODS_RECIPIENT_USERNAME,
+						 US.USER_NAME AS USER_NAME,
+						 US.LAST_NAME AS LAST_NAME,
+						 US.FIRST_NAME AS FIRST_NAME,
+						 BUD.BUDGET_YEAR AS BUDGET_YEAR,
+						 To_Char(RQ.CREATED_DATE_TZ,'YYYY-MM-DD') AS REQUEST_CREATED_DATE,
+               			 VAM.MESSAGE_READ,
+               			 VAM.SHOW_MESSAGE_READ,
+               			 RQ.CREATED_USER_ID,
+               			 (CASE WHEN (ST.STATUS_ID = 5 OR ST.STATUS_ID = 6) AND USR.ROLE_ID != 1 THEN FALSE ELSE TRUE END) AS EDITABLE
+				  FROM "REQUEST" RQ
+					  INNER JOIN "REQUEST_STATUS" ST ON RQ.STATUS_ID = ST.STATUS_ID
+					  LEFT JOIN "VENDOR_ADDITIONAL_INFORMATION" VAI ON VAI.VENDOR_ADDITIONAL_INFORMATION_ID = RQ.VENDOR_ADDITIONAL_INFORMATION_ID 
+					  INNER JOIN "REQUEST_SERVICE" RS ON RQ.REQUEST_ID = RS.REQUEST_ID
+					  INNER JOIN "CURRENCY" CUR ON RS.CURRENCY_ID = CUR.CURRENCY_ID
+					  INNER JOIN "CRT_TYPE" CTY ON RQ.CRT_TYPE_ID = CTY.CRT_TYPE_ID AND CTY.ENABLED = 1 AND CTY.DELETED = 0
+					  LEFT JOIN "HL3" HL3 ON RQ.HL3_ID = HL3.HL3_ID
+					  LEFT JOIN "USER" US ON RQ.CREATED_USER_ID = US.USER_ID
+					  LEFT JOIN "BUDGET_YEAR" BUD ON RQ.BUDGET_YEAR_ID = BUD.BUDGET_YEAR_ID
+					  LEFT JOIN :va_message VAM ON RQ.REQUEST_ID = VAM.REQUEST_ID
+					  INNER JOIN :va_user_role USR ON USR.ENABLED = 1 
+				  WHERE (USR.ROLE_ID != 2 AND RQ.ENABLED = 1 AND RQ.DELETED = 0)
+		              		OR (USR.ROLE_ID = 2 
+		              			AND ((USR.HL3_ID = RQ.HL3_ID AND RQ.CREATED_USER_ID = in_user_id) OR (USR.HL3_ID is null AND RQ.CREATED_USER_ID = in_user_id)) 
+		              			AND RQ.ENABLED = 1 AND RQ.DELETED = 0)
+		              		ORDER BY RQ.request_id DESC;
+		              		
+	out_service_table = SELECT 
+  				SER.request_id,
+  				SER.service_id, 
+  				TO_NVARCHAR(SER.start_date, 'YYYY-MM-DD') AS start_date, 
+  				TO_NVARCHAR(SER.end_date, 'YYYY-MM-DD') AS end_date, 
+  				SER.description, 
+  				SER.amount, 
+  				SER.currency_id, 
+  				CU.ABBREVIATION AS currency_abbreviation,
+  				SER.budget, 
+  				SER.item,
+  				SER.line_number,
+  				POS.shopping_cart, 
+  				POS.cart_date, 
+  				POS.purchase_order_number,
+  				POS.approval_date,
+  				POS.user_id
+            FROM "SERVICE" SER
+            INNER JOIN "CURRENCY" CU ON SER.CURRENCY_ID = CU.CURRENCY_ID
+            LEFT JOIN :va_purchase_order POS ON SER.REQUEST_ID = POS.REQUEST_ID
+            WHERE SER.ENABLED = 1 AND SER.DELETED = 0
+            ORDER BY SER.ITEM;
+            
+     out_attachment_table = SELECT
+     							"ATTACHMENT_REQUEST".REQUEST_ID,
+								"ATTACHMENT".ATTACHMENT_ID, 
+								"ATTACHMENT".USER_ID, 
+								"ATTACHMENT".ORIGINAL_NAME, 
+								"ATTACHMENT".SAVED_NAME, 
+								"ATTACHMENT".ATTACHMENT_SIZE
+							FROM "ATTACHMENT_REQUEST"
+								INNER JOIN "ATTACHMENT" AS ATTACHMENT ON "ATTACHMENT_REQUEST".attachment_id = ATTACHMENT.attachment_id
+								WHERE "ATTACHMENT".deleted = 0
+								AND "ATTACHMENT".enabled = 1;
+END;

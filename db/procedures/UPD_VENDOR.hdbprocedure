@@ -1,0 +1,43 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::UPD_VENDOR" (
+  IN in_vendor_id BIGINT,
+  IN in_address_1 NVARCHAR(255),
+  IN in_address_2 NVARCHAR(255),
+  IN in_city NVARCHAR(255),
+  IN in_state NVARCHAR(255),
+  IN in_zip NVARCHAR(255),
+  IN in_phone NVARCHAR(255),
+  IN in_fax NVARCHAR(255),
+  IN in_legal_name NVARCHAR(255),
+  IN in_informal_name NVARCHAR(255),
+  IN in_account NVARCHAR(255),
+  IN in_data_protection_enabled TINYINT,
+  IN in_modified_user_id BIGINT,
+  IN in_status_id BIGINT,
+  OUT out_result BIGINT
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+AS
+BEGIN
+	UPDATE "MKTG_CART_REQUEST_TOOL"."VENDOR"
+	SET ADDRESS_1 = in_address_1,
+  	ADDRESS_2 = in_address_2,
+    CITY = in_city,
+    STATE = in_state,
+  	ZIP = in_zip,
+	PHONE = in_phone,
+	FAX = in_fax,
+	LEGAL_NAME = in_legal_name,
+ 	INFORMAL_NAME = in_informal_name,
+ 	ACCOUNT = (CASE WHEN (in_status_id = 5) THEN in_account ELSE ACCOUNT END),
+ 	DATA_PROTECTION_ENABLED = in_data_protection_enabled,
+	MODIFIED_DATE_TZ = CURRENT_TIMESTAMP,
+	MODIFIED_USER_ID = in_modified_user_id,
+	STATUS_ID = in_status_id,
+	ENABLED = 1,
+	DELETED = 0
+	WHERE VENDOR_ID = in_vendor_id;
+
+SELECT ::ROWCOUNT into out_result FROM DUMMY;
+END;

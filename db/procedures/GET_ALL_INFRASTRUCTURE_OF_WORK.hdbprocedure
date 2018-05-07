@@ -1,0 +1,13 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_ALL_INFRASTRUCTURE_OF_WORK" (
+	OUT out_result TABLE (infrastructure_of_work_id bigint, infrastructure_name nvarchar(255))
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA AS
+BEGIN
+	out_result = SELECT IOW.infrastructure_of_work_id, IOW.infrastructure_name
+					FROM "INFRASTRUCTURE_OF_WORK" IOW
+							WHERE IOW.enabled = 1 AND IOW.deleted = 0
+					ORDER BY UPPER(IOW.INFRASTRUCTURE_NAME);
+END;

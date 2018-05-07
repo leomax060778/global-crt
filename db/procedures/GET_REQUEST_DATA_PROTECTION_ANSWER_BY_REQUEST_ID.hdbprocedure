@@ -1,0 +1,35 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_REQUEST_DATA_PROTECTION_ANSWER_BY_REQUEST_ID"(
+		IN in_request_id BIGINT, 
+		OUT out_result TABLE (
+			request_id BIGINT,
+			option_id INTEGER,
+			option NVARCHAR(512),
+			option_deleted TINYINT,
+			question_id INTEGER,
+			question NVARCHAR(512),
+			short_description nvarchar(255),
+			question_deleted tinyint
+		)
+	)
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	READS SQL DATA
+AS
+BEGIN
+	out_result = SELECT RDPA.REQUEST_ID, 
+				RDPA.OPTION_ID, 
+				DPO.CONTENT AS option, 
+				DPO.deleted as option_deleted,
+				RDPA.QUESTION_ID, 
+				DPQ.CONTENT AS question,
+				DPQ.short_description,
+				DPQ.deleted as question_deleted
+			FROM "REQUEST_DATA_PROTECTION_ANSWER" RDPA
+				LEFT OUTER JOIN "DATA_PROTECTION_QUESTION" DPQ
+					ON RDPA.QUESTION_ID = DPQ.QUESTION_ID
+				LEFT OUTER JOIN "DATA_PROTECTION_OPTION" DPO
+					ON RDPA.OPTION_ID = DPO.OPTION_ID
+			WHERE in_request_id = RDPA.REQUEST_ID
+				ORDER BY RDPA.QUESTION_ID;
+END;

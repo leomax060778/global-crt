@@ -1,0 +1,48 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_VENDOR_BY_ADDITIONAL_INFORMATION_ID" ( 
+IN in_vendor_additional_information_id bigint,
+OUT out_result TABLE (vendor_id bigint,
+						account nvarchar (255),
+						name nvarchar (255),
+						vendor_additional_information_id bigint,
+						contact_name nvarchar (255),
+						contact_email nvarchar (255),
+						contact_phone nvarchar (255),
+						address_1 nvarchar (255),
+						address_2 nvarchar (255),
+						city nvarchar (255),
+						state nvarchar (255),
+						zip nvarchar (255),
+						phone nvarchar (255),
+						fax nvarchar (255),
+						legal_name nvarchar (255),
+						informal_name nvarchar (255)
+					)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+READS SQL DATA AS
+BEGIN
+out_result = SELECT DISTINCT VAI.vendor_id,
+					V.account,
+					VAI.vendor_name as name,
+					VAI.vendor_additional_information_id,
+					VCI.name as contact_name,
+			        VCI.email as contact_email,
+			        VCI.phone as contact_phone,
+			        V.address_1,
+			        V.address_2,
+			        V.city,
+			        V.state,
+			        V.zip,
+			        V.phone,
+			        V.fax,
+			        V.legal_name,
+			        V.informal_name
+         FROM "VENDOR_ADDITIONAL_INFORMATION" VAI
+	         INNER JOIN "VENDOR" V ON VAI.vendor_id = V.vendor_id
+	         LEFT JOIN "VENDOR_CONTACT_INFORMATION" VCI ON VCI.VENDOR_ID = V.VENDOR_ID AND VCI.DEFAULT_CONTACT_INFORMATION = 1
+	         INNER JOIN "VENDOR_STATUS" ST ON V.STATUS_ID = ST.STATUS_ID AND ST.NAME = 'Approved'
+         WHERE VAI.VENDOR_ADDITIONAL_INFORMATION_ID = in_vendor_additional_information_id 
+         	ORDER BY UPPER(VAI.VENDOR_NAME);
+END;

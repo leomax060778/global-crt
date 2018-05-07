@@ -1,0 +1,39 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_VENDOR_REQUEST" (
+	IN in_user_id BIGINT,
+	IN in_country_id BIGINT,
+	IN in_entity_id BIGINT,
+	IN in_commodity_id BIGINT,
+	IN in_not_used_sap_supplier NVARCHAR(1000),
+	IN in_service_supplier NVARCHAR(1000),
+	IN in_vendor_type_id INTEGER,
+	IN in_purchase_amount DECIMAL(19,2),
+	IN in_expected_amount DECIMAL(19,2),
+	IN in_purchase_currency_id INTEGER,
+	IN in_expected_currency_id INTEGER,
+	IN in_accept_american_express TINYINT,
+	IN in_cost_center_owner NVARCHAR(511),
+	IN in_additional_information TINYINT,
+	IN in_vendor_additional_information_id BIGINT,
+	IN in_created_user_id BIGINT,
+	IN in_vendor_id BIGINT,
+	OUT out_result BIGINT
+)
+	
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+
+--Get the next value for ID field
+SELECT "MKTG_CART_REQUEST_TOOL".SEQ_VENDOR_REQUEST.NEXTVAL INTO out_result FROM dummy;
+
+  INSERT INTO "MKTG_CART_REQUEST_TOOL"."VENDOR_REQUEST"(VENDOR_REQUEST_ID, USER_ID, COUNTRY_ID, ENTITY_ID, COMMODITY_ID, NOT_USED_SAP_SUPPLIER,
+   SERVICE_SUPPLIER, VENDOR_TYPE_ID, PURCHASE_AMOUNT, EXPECTED_AMOUNT, PURCHASE_CURRENCY_ID, EXPECTED_CURRENCY_ID,
+   ACCEPT_AMERICAN_EXPRESS, COST_CENTER_OWNER, ADDITIONAL_INFORMATION, VENDOR_ADDITIONAL_INFORMATION_ID, CREATED_USER_ID, VENDOR_ID)
+    VALUES(out_result, in_user_id, in_country_id, in_entity_id, in_commodity_id, in_not_used_sap_supplier, in_service_supplier, in_vendor_type_id,
+        in_purchase_amount, in_expected_amount, in_purchase_currency_id, in_expected_currency_id, in_accept_american_express,
+        in_cost_center_owner, in_additional_information, in_vendor_additional_information_id, in_created_user_id, in_vendor_id);
+	
+  SELECT out_result FROM dummy;
+END;

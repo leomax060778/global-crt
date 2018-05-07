@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dimension:dimension xmlns:Dimension="http://www.sap.com/ndb/BiModelDimension.ecore" schemaVersion="1.2" id="AT_VENDOR_ADDITIONAL_INFORMATION" applyPrivilegeType="ANALYTIC_PRIVILEGE" checkAnalyticPrivileges="true" defaultClient="$$client$$" defaultLanguage="$$language$$" hierarchiesSQLEnabled="false" translationRelevant="true" visibility="internal" dimensionType="Standard">
+  <descriptions defaultDescription="Attribute view to get additional information of the vendor"/>
+  <informationModelLayout relativeWidthScenario="27"/>
+  <attributes>
+    <attribute id="VENDOR_NAME" order="1" attributeHierarchyActive="false" displayAttribute="false">
+      <descriptions defaultDescription="VENDOR_NAME"/>
+      <keyMapping schemaName="MKTG_CART_REQUEST_TOOL" columnObjectName="VENDOR_ADDITIONAL_INFORMATION" columnName="VENDOR_NAME"/>
+    </attribute>
+    <attribute id="VENDOR_ID" order="2" attributeHierarchyActive="false" displayAttribute="false">
+      <descriptions defaultDescription="VENDOR_ID"/>
+      <keyMapping schemaName="MKTG_CART_REQUEST_TOOL" columnObjectName="VENDOR_ADDITIONAL_INFORMATION" columnName="VENDOR_ID"/>
+    </attribute>
+    <attribute id="VENDOR_ADDITIONAL_INFORMATION_ID" order="3" attributeHierarchyActive="false" displayAttribute="false">
+      <descriptions defaultDescription="VENDOR_ADDITIONAL_INFORMATION_ID"/>
+      <keyMapping schemaName="MKTG_CART_REQUEST_TOOL" columnObjectName="VENDOR_ADDITIONAL_INFORMATION" columnName="VENDOR_ADDITIONAL_INFORMATION_ID"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <privateDataFoundation>
+    <tableProxies>
+      <tableProxy>
+        <table schemaName="MKTG_CART_REQUEST_TOOL" columnObjectName="VENDOR_ADDITIONAL_INFORMATION"/>
+      </tableProxy>
+    </tableProxies>
+    <joins/>
+    <layout>
+      <shapes>
+        <shape modelObjectName="VENDOR_ADDITIONAL_INFORMATION" modelObjectNameSpace="MKTG_CART_REQUEST_TOOL" modelObjectType="catalog">
+          <upperLeftCorner x="70" y="30"/>
+        </shape>
+        <shape modelObjectName="DataFoundation" modelObjectNameSpace="DataFoundation" modelObjectType="repository">
+          <upperLeftCorner x="40" y="85"/>
+          <rectangleSize height="0" width="0"/>
+        </shape>
+      </shapes>
+    </layout>
+  </privateDataFoundation>
+  <hierarchies/>
+</Dimension:dimension>

@@ -1,0 +1,30 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::GET_MATERIAL_BY_ID" (
+  IN in_material_id bigint,
+  OUT out_result TABLE (material_id bigint, 
+  						catalog_id bigint, 
+  						description nvarchar(255), 
+  						pop_up nvarchar(255), 
+  						code nvarchar(255),
+  						used integer
+  						)
+)
+LANGUAGE SQLSCRIPT
+SQL SECURITY INVOKER
+DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+READS SQL DATA AS
+BEGIN
+  out_result = SELECT 	MT.material_id, 
+  						MT.catalog_id, 
+  						MT.description, 
+  						MT.popup as pop_up, 
+  						MT.code,
+  						count(DISTINCT RQ.REQUEST_ID) as used
+              FROM "MKTG_CART_REQUEST_TOOL"."MATERIAL" MT
+              LEFT JOIN "MKTG_CART_REQUEST_TOOL"."REQUEST" RQ ON RQ.MATERIAL_ID = MT.MATERIAL_ID
+               WHERE MT.MATERIAL_ID = in_material_id
+               GROUP BY MT.material_id, 
+  						MT.catalog_id, 
+  						MT.description, 
+  						MT.popup, 
+  						MT.code;
+END;

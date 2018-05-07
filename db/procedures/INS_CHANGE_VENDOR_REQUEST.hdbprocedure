@@ -1,0 +1,53 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_CHANGE_VENDOR_REQUEST"
+	(
+	IN in_user_id bigint,
+	IN in_entity_id bigint,
+    IN in_commodity_id bigint,
+	IN in_vendor_type_id bigint,
+	IN in_created_user_id bigint,
+	IN in_vendor_name nvarchar(255),
+	IN in_vendor_account nvarchar(255),
+	IN in_vendor_contact_name nvarchar(255),
+	IN in_vendor_contact_phone nvarchar(255),
+	IN in_vendor_contact_email nvarchar(255),
+	IN in_additional_information tinyint,
+	OUT out_result bigint
+	)
+	
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+
+--Get the next value for ID field
+SELECT "MKTG_CART_REQUEST_TOOL".SEQ_CHANGE_VENDOR_REQUEST.NEXTVAL INTO out_result FROM dummy;
+
+  INSERT INTO "MKTG_CART_REQUEST_TOOL"."CHANGE_VENDOR_REQUEST"(CHANGE_VENDOR_REQUEST_ID,
+	  	user_id, 
+	  	entity_id, 
+	  	commodity_id,
+		vendor_type_id, 
+		created_user_id, 
+		vendor_name,
+		vendor_account,
+		vendor_contact_name,
+		vendor_contact_phone,
+		vendor_contact_email,
+		additional_information
+	) VALUES( out_result,
+		in_user_id, 
+		in_entity_id, 
+		in_commodity_id, 
+		in_vendor_type_id, 
+		in_created_user_id, 
+		in_vendor_name,
+		in_vendor_account,
+		in_vendor_contact_name,
+		in_vendor_contact_phone,
+		in_vendor_contact_email,
+		in_additional_information
+		);
+	
+  SELECT out_result FROM dummy;
+END;	

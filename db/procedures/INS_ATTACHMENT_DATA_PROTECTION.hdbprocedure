@@ -1,0 +1,23 @@
+PROCEDURE "MKTG_CART_REQUEST_TOOL"."mktgcartrequesttool.db.procedures::INS_ATTACHMENT_DATA_PROTECTION" (
+	IN in_attachment_data_protection_description nvarchar(255),
+	IN in_attachment_id bigint,
+	IN in_created_user_id bigint,
+	OUT out_result bigint
+ ) 
+	LANGUAGE SQLSCRIPT
+	SQL SECURITY INVOKER 
+	DEFAULT SCHEMA "MKTG_CART_REQUEST_TOOL"
+	AS
+BEGIN
+	INSERT INTO "ATTACHMENT_DATA_PROTECTION"(
+			description, 
+			attachment_id, 
+			created_user_id)
+		VALUES (
+			in_attachment_data_protection_description, 
+			in_attachment_id,
+			in_created_user_id
+		);
+		
+	SELECT TOP 1 CURRENT_IDENTITY_VALUE() INTO out_result FROM "MKTG_CART_REQUEST_TOOL"."ATTACHMENT_DATA_PROTECTION";
+END;
