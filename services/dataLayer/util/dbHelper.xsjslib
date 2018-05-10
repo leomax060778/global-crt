@@ -3,7 +3,7 @@ var mapper = $.mktgcartrequesttool.services.commonLib.mapper;
 var errors = mapper.getErrors();
 
 /************************ CONSTANTS ***********************************/
-var DB_NAME = "CART_REQUEST_TOOL";
+var DB_NAME = "MKTG_CART_REQUEST_TOOL";
 var DB_SP_PATH = "mktgcartrequesttool.db.procedures::";
 var DB_CONNECTION =  null;
 var HDB_CONNECTION = null;

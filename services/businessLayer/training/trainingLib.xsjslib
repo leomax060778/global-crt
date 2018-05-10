@@ -49,39 +49,43 @@ function getTrainingById(trainingId) {
 //Get all training
 function getAllTraining() {
     var result = dataTraining.getTraining();
-    result = JSON.parse(JSON.stringify(result));
-    var tree = {};
-    var plainResult = {};
-    var masterRootId = 0;
-    for (var i = 0; i < result.length; i++) {
-        var row = result[i];
-        tree[row.PARENT_ID] = tree[row.PARENT_ID] || {NODES: {}};
-        tree[row.TRAINING_ID] = tree[row.TRAINING_ID] || {};
-        var currentNode = tree[row.TRAINING_ID];
-        currentNode.TRAINING_ID = row.TRAINING_ID;
-        currentNode.PARENT_ID = row.PARENT_ID;
-        currentNode.TRAINING_TYPE_ID = row.TRAINING_TYPE_ID;
-        currentNode.TRAINING_TYPE_NAME = row.TRAINING_TYPE_NAME;
-        currentNode.LINK = row.LINK;
-        currentNode.NAME = row.NAME;
-        currentNode.DESCRIPTION = row.DESCRIPTION;
-        currentNode.TRAINING_ORDER = row.TRAINING_ORDER;
-        currentNode.ATTACHMENT_ID = row.ATTACHMENT_ID;
-        currentNode.ORIGINAL_NAME = row.ORIGINAL_NAME;
-        currentNode.SAVED_NAME = row.SAVED_NAME;
-        currentNode.DATA_PROTECTION_FOLDER = row.DATA_PROTECTION_FOLDER === 1;
-        currentNode.CREATED_DATE_TZ = row.CREATED_DATE_TZ;
-        currentNode.MODIFIED_DATE_TZ = row.MODIFIED_DATE_TZ;
-        currentNode.NODES = currentNode.NODES || {};
-        var parentNode = tree[row.PARENT_ID];
-        parentNode.NODES[currentNode.TRAINING_ID] = currentNode;
+    if (result.length) {
+        result = JSON.parse(JSON.stringify(result));
+        var tree = {};
+        var plainResult = {};
+        var masterRootId = 0;
+        for (var i = 0; i < result.length; i++) {
+            var row = result[i];
+            tree[row.PARENT_ID] = tree[row.PARENT_ID] || {NODES: {}};
+            tree[row.TRAINING_ID] = tree[row.TRAINING_ID] || {};
+            var currentNode = tree[row.TRAINING_ID];
+            currentNode.TRAINING_ID = row.TRAINING_ID;
+            currentNode.PARENT_ID = row.PARENT_ID;
+            currentNode.TRAINING_TYPE_ID = row.TRAINING_TYPE_ID;
+            currentNode.TRAINING_TYPE_NAME = row.TRAINING_TYPE_NAME;
+            currentNode.LINK = row.LINK;
+            currentNode.NAME = row.NAME;
+            currentNode.DESCRIPTION = row.DESCRIPTION;
+            currentNode.TRAINING_ORDER = row.TRAINING_ORDER;
+            currentNode.ATTACHMENT_ID = row.ATTACHMENT_ID;
+            currentNode.ORIGINAL_NAME = row.ORIGINAL_NAME;
+            currentNode.SAVED_NAME = row.SAVED_NAME;
+            currentNode.DATA_PROTECTION_FOLDER = row.DATA_PROTECTION_FOLDER === 1;
+            currentNode.CREATED_DATE_TZ = row.CREATED_DATE_TZ;
+            currentNode.MODIFIED_DATE_TZ = row.MODIFIED_DATE_TZ;
+            currentNode.NODES = currentNode.NODES || {};
+            var parentNode = tree[row.PARENT_ID];
+            parentNode.NODES[currentNode.TRAINING_ID] = currentNode;
 
+        }
+        result.forEach(function (elem) {
+            plainResult[elem.TRAINING_ID] = elem;
+        });
+        calculateDateRecursive({TRAINING_TYPE_ID: trainingTypeMap.DIRECTORY, NODES: tree[masterRootId].NODES, CREATED_DATE_TZ: 0, MODIFIED_DATE_TZ: 0}, [{0: "Desktop"}]);
+        return {TREE: tree[masterRootId].NODES, RESULT: plainResult};
+    } else {
+        return {TREE: [], RESULT: []};
     }
-    result.forEach(function (elem) {
-    	plainResult[elem.TRAINING_ID] = elem;
-    });
-    calculateDateRecursive({TRAINING_TYPE_ID: trainingTypeMap.DIRECTORY, NODES: tree[masterRootId].NODES, CREATED_DATE_TZ: 0, MODIFIED_DATE_TZ: 0}, [{0: "Desktop"}]);
-    return {TREE: tree[masterRootId].NODES, RESULT: plainResult};
 }
 
 function calculateDateRecursive(training, path) {
@@ -230,7 +234,7 @@ function validateUpdateTraining(objTraining, userId) {
                         'DESCRIPTION',
                         'TRAINING_ORDER'
                         ];
-    
+
     if (!objTraining) {
         throw ErrorLib.getErrors().CustomError("", "", "The object Training is not found");
     }
@@ -256,9 +260,9 @@ function validateUpdateTraining(objTraining, userId) {
             	errors[key] = objTraining[key];
                 throw BreakException;
             }
-            
+
         });
-        
+
         isValid = true;
     } catch (e) {
         if (e !== BreakException) {

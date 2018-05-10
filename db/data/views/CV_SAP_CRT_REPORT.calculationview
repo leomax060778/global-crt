@@ -62,10 +62,10 @@
  /********* Begin Procedure Script ************/ 
  BEGIN 
  	va_crt_type = SELECT CT.CRT_TYPE_ID, CT.ISO
- 					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_CRT_TYPE&quot; CT;
+ 					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_CRT_TYPE&quot; CT;
 						
 	va_last_message = SELECT MAX(LRM.CREATED_DATE_TZ) AS LAST_MESSAGE, LRM.REQUEST_ID
-						FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST_MESSAGE&quot; LRM
+						FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST_MESSAGE&quot; LRM
 						GROUP BY LRM.REQUEST_ID;
  
  	va_message = SELECT RM.REQUEST_ID,
@@ -73,32 +73,32 @@
  						RM.CREATED_DATE_TZ, 
  						('Written by: ' || MUS.FIRST_NAME || ' ' || MUS.LAST_NAME || ' (' || MUS.USER_NAME || ') on ' || TO_NVARCHAR(RM.CREATED_DATE_TZ, 'YYYY-MM-DD hh-mm')) AS MESSAGE_INFO,
  						RT.NAME
- 					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST_MESSAGE&quot; RM
- 						INNER JOIN &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_USER&quot; MUS ON RM.CREATED_USER_ID = MUS.USER_ID
- 						LEFT JOIN &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_MESSAGE_TYPE&quot; RT ON RM.MESSAGE_TYPE_ID = RT.MESSAGE_TYPE_ID
+ 					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST_MESSAGE&quot; RM
+ 						INNER JOIN &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_USER&quot; MUS ON RM.CREATED_USER_ID = MUS.USER_ID
+ 						LEFT JOIN &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_MESSAGE_TYPE&quot; RT ON RM.MESSAGE_TYPE_ID = RT.MESSAGE_TYPE_ID
  						INNER JOIN :va_last_message LRM ON RM.CREATED_DATE_TZ = LRM.LAST_MESSAGE;
 
 	va_requester = SELECT US.USER_ID,
 						(US.FIRST_NAME || ' ' || US.LAST_NAME || ', ' || US.USER_NAME) AS REQUESTER
- 					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_USER&quot; US;
+ 					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_USER&quot; US;
  					
  	va_hl3 = SELECT HL3.HL3_ID, HL3.ACRONYM AS TEAM
- 				FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_HL3&quot; HL3;
+ 				FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_HL3&quot; HL3;
  				
  	va_vendor = SELECT V.VENDOR_ID, V.ACCOUNT AS VENDOR_ACCOUNT
- 					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_VENDOR&quot; V;
+ 					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_VENDOR&quot; V;
  					
 	va_vendor_additional_information = SELECT VAI.VENDOR_ADDITIONAL_INFORMATION_ID, VAI.VENDOR_ID, VAI.VENDOR_NAME
-											FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_VENDOR_ADDITIONAL_INFORMATION&quot; VAI;
+											FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_VENDOR_ADDITIONAL_INFORMATION&quot; VAI;
 								
 	va_po_service = SELECT POS.REQUEST_ID, POS.SHOPPING_CART AS CART_NUMBER,
 		                    POS.CART_DATE,
 		                    POS.PURCHASE_ORDER_NUMBER,
 		                    POS.APPROVAL_DATE AS PURCHASE_DATE
-						FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_PURCHASE_ORDER_SERVICE&quot; POS;
+						FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_PURCHASE_ORDER_SERVICE&quot; POS;
 						
 	va_entity = SELECT EN.ENTITY_ID, EN.ENTITY_NAME AS SAP_ENTITY
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_ENTITY&quot; EN;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_ENTITY&quot; EN;
 					
 	va_service = SELECT SV.DESCRIPTION AS DESCRIPTION_PURCHASE_ORDER,
 						SV.REQUEST_ID,
@@ -108,27 +108,27 @@
                     	SV.BUDGET,
                     	SV.ITEM,
                     	SV.LINE_NUMBER
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_SERVICE&quot; SV;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_SERVICE&quot; SV;
 					
 	va_request_cost_object = SELECT RCO.COST_VALUE AS COST_OBJECT,
 									RCO.REQUEST_ID
-								FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST_COST_OBJECT&quot; RCO;
+								FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST_COST_OBJECT&quot; RCO;
 							
 	va_request_service = SELECT RS.REQUEST_ID, RS.CURRENCY_ID
-							FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST_SERVICE&quot; RS;
+							FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST_SERVICE&quot; RS;
 								
 	va_currency = SELECT CUR.ABBREVIATION AS CURRENCY,
 						 CUR.CURRENCY_ID
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_CURRENCY&quot; CUR;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_CURRENCY&quot; CUR;
 					
 	va_status = SELECT ST.STATUS_ID, ST.NAME AS STATUS
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST_STATUS&quot; ST;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST_STATUS&quot; ST;
 					
 	va_stage = SELECT SG.STAGE_ID, SG.NAME AS STAGE_NAME
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_STAGE&quot; SG;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_STAGE&quot; SG;
 					
 	va_budget_year = SELECT BUD.BUDGET_YEAR_ID, BUD.BUDGET_YEAR
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_BUDGET_YEAR&quot; BUD;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_BUDGET_YEAR&quot; BUD;
 							
 	va_request = SELECT RQ.REQUEST_ID,
 						RQ.CREATED_USER_ID,
@@ -147,7 +147,7 @@
 						RQ.BUDGET_YEAR_ID,
 						RQ.VENDOR_ADDITIONAL_INFORMATION_ID,
 						RQ.DATA_PROTECTION_ENABLED
-					FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_REQUEST&quot; RQ;
+					FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_REQUEST&quot; RQ;
 					
 	va_material = SELECT MT.MATERIAL_ID,
 						 MT.DESCRIPTION AS MATERIAL_DESCRIPTION,
@@ -157,10 +157,10 @@
                     	 SC.CATALOG_TYPE_ID AS MATERIAL_CATALOG_TYPE_ID,
                     	 CPC.NAME AS PRODUCT_CATEGORY,
                     	 CAT.NAME AS PRODUCT_CATALOG
-                   	FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_MATERIAL&quot; MT
-                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_CATALOG&quot; SC ON MT.CATALOG_ID = SC.CATALOG_ID
-                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_CATALOG&quot; CPC ON SC.CATALOG_PARENT_ID = CPC.CATALOG_ID
-                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_CATALOG&quot; CAT ON CPC.CATALOG_PARENT_ID = CAT.CATALOG_ID;
+                   	FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_MATERIAL&quot; MT
+                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_CATALOG&quot; SC ON MT.CATALOG_ID = SC.CATALOG_ID
+                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_CATALOG&quot; CPC ON SC.CATALOG_PARENT_ID = CPC.CATALOG_ID
+                   		LEFT JOIN &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_CATALOG&quot; CAT ON CPC.CATALOG_PARENT_ID = CAT.CATALOG_ID;
                    		
 					
 	va_special_request = SELECT SRQ.REQUEST_ID,
@@ -172,7 +172,7 @@
 								SRQ.END_DATE,
 								SRQ.AMOUNT,
 								SRQ.BUDGET
-							FROM &quot;_SYS_BIC&quot;.&quot;xscartrequesttool.db.data.views/AT_SPECIAL_REQUEST&quot; SRQ;
+							FROM &quot;_SYS_BIC&quot;.&quot;mktgcartrequesttool.db.data.views/AT_SPECIAL_REQUEST&quot; SRQ;
 						
 							
 	va_sub_out = SELECT (CT.ISO || TO_NVARCHAR(RQ.REQUEST_ID)) AS REQUEST_ID,
